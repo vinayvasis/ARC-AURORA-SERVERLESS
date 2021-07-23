@@ -1,49 +1,75 @@
 import os
 import os.path
 import sys
-
-# Use latest boto3 from local environment
-#LAMBDA_TASK_ROOT = os.environ["LAMBDA_TASK_ROOT"]
-#sys.path.insert(0, LAMBDA_TASK_ROOT+"/boto3")
-
-# Required imports
 import botocore
 import boto3
-
-# Imports for your app
-from datetime import datetime
-
-# Update your cluster and secret ARNs
-cluster_arn = 'arn:aws:rds:us-east-1:0000000000:cluster:my-cluster' 
-secret_arn = 'arn:aws:secretsmanager:us-east-1:0000000000:secret:my-secret'
-
-def lambda_handler(event, context):
-    if 'Records' not in event or 'Sns' not in event['Records'][0]:
-        print('Not an SNS event!')
-        print(str(event))
-        return
-
-    for record in event['Records']:
-        call_rds_data_api(record['Sns']['Timestamp'], record['Sns']['Message'])
+import json
+from .constants import cluster_arn, secret_arn
 
 
-def call_rds_data_api(timestamp, message):
+
+# Use latest boto3 from local environment
+# LAMBDA_TASK_ROOT = os.environ["LAMBDA_TASK_ROOT"]
+# sys.path.insert(0, LAMBDA_TASK_ROOT+"/boto3")
+
+
+def call_rds_data_api(template_name):
     rds_data = boto3.client('rds-data')
 
     sql = """
-          INSERT INTO sample_table(received_at, message)
-          VALUES(TO_TIMESTAMP(:time, 'YYYY-MM-DD HH24:MI:SS'), :message)
+          INSERT INTO TEMPLATE(template_name)
+          VALUES( :template_name)
           """
+    param1 = {'name': 'template_name', 'value': {'stringValue': template_name}}
+    param_set = [param1]
 
-    param1 = {'name':'time', 'value':{'stringValue': timestamp}}
-    param2 = {'name':'message', 'value':{'stringValue': message}}
-    param_set = [param1, param2]
- 
     response = rds_data.execute_statement(
-        resourceArn = cluster_arn, 
-        secretArn = secret_arn, 
-        database = 'tutorial', 
-        sql = sql,
-        parameters = param_set)
-    
-    print(str(response));
+        resourceArn=cluster_arn,
+        secretArn=secret_arn,
+        database='tutorial',
+        sql=sql,
+        parameters=param_set)
+
+    print(str(response))
+
+
+def execute_query(sql_statement):
+    rds_data = boto3.client('rds-data')
+
+    response = rds_data.execute_sql(
+        awsSecretStoreArn='string',
+        database='string',
+        dbClusterOrInstanceArn='string',
+        schema='string',
+        sqlStatements=sql_statement
+    )
+    print(str(response))
+
+
+def get_api(event):
+    return {
+        "statusCode": 200,
+        "headers": {
+            "Content-Type": "application/json",
+        },
+        "body": json.dumps(event, indent=4),
+    }
+
+
+def lambda_handler(event, context):
+    # call from api gateway
+
+    # json_body = json.dumps(event, indent=4)
+    # print(json_body)
+
+    # sample json print
+
+    with open("sample.json") as json_file:
+        json_data = json.load(json_file)
+        print(json_data)
+
+    # fill template_name here
+    template_name = ""
+    call_rds_data_api(template_name)
+
+# lambda_handler(None,None)

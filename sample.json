@@ -1,0 +1,33 @@
+[
+  {
+    "sheet_name": "Rolling 12 Months",
+    "datamart_view": "ASP_TRAN_DOC_FINCL_RPTG_VW",
+    "external_tables": null,
+    "column_names": [
+	"CLNDR_YR_445 AS \"Year\"",
+	"CLNDR_MTH_AND_YR_445 AS \"YearMonth\"",
+	"CAST(DOM_FARE_AMT AS INT) AS \"Domestic Fare\"",
+	"CAST(INTL_FARE_AMT AS INT) AS \"International Fare\"",
+	"CAST(FARE_AMT AS INT) AS \"Total Fare\"",
+	"CAST(TKTG_CARR_FEE_AMT AS INT) AS \"Airline Fees\"",
+	"CAST(NON_TKTG_CARR_FEE_AMT AS INT) AS \"Taxes and Non-Airline Fees\"",
+	"CAST(TAX_FEE_AMT AS INT) AS \"Total Taxes and Fees\"",
+	"CAST(CREDIT_DOC_AMT AS INT) AS \"Credit Sales\"",
+	"CAST(CASH_DOC_AMT AS INT) AS \"Cash Sales\"",
+	"CAST(DOC_AMT AS INT) AS \"Total Sales\"",
+	"CAST(REF_EXCH_AMT AS INT) AS \"Refund and Exchange Charges\"",
+	"CREDIT_SALE_CNT AS \"Credit Transactions\"",
+	"CASH_SALE_CNT AS \"Cash Transactions\"",
+	"PSGR_TRIP_CNT AS \"Total Transactions\"",
+	"DOM_PSGR_TRIP_CNT AS \"Domestic Transactions\"",
+	"INTL_PSGR_TRIP_CNT AS \"International Transactions\""
+    ],
+
+    "column_widths": null,
+    "where_clause": "CUSTOMER_NM='BLOOMBERG' AND RPT_TYPE_CD='STATISTICS'",
+    "orderby_clause": "ORDER BY CLNDR_MTH_AND_YR_445 ASC",
+    "output_extension": "xls",
+    "output_file_type": "semicolon_delimited",
+    "schema_view": "ASP_EMERGING_VWS"
+  }
+]
